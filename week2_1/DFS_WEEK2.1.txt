@@ -1,0 +1,90 @@
+class State:
+    def __init__(self, x, y, z, parent):
+        self.x = x
+        self.y = y
+        self.z = z
+        self.parent = parent
+
+
+# Generate next possible states
+def get_next_states(s, a, b, c):
+    states = []
+    x, y, z = s.x, s.y, s.z
+    states.append(State(a, y, z, s))
+    states.append(State(x, b, z, s))
+    states.append(State(x, y, c, s))
+    states.append(State(0, y, z, s))
+    states.append(State(x, 0, z, s))
+    states.append(State(x, y, 0, s))
+    t = min(x, b - y)
+    states.append(State(x - t, y + t, z, s))
+    t = min(x, c - z)
+    states.append(State(x - t, y, z + t, s))
+    t = min(y, a - x)
+    states.append(State(x + t, y - t, z, s))
+    t = min(y, c - z)
+    states.append(State(x, y - t, z + t, s))
+    t = min(z, a - x)
+    states.append(State(x + t, y, z - t, s))
+    t = min(z, b - y)
+    states.append(State(x, y + t, z - t, s))
+
+    return states
+
+
+# DFS Implementation
+def dfs(a, b, c, target):
+    stack = []
+    visited = set()
+
+    start = State(0, 0, 0, None)
+    stack.append(start)
+    visited.add((0, 0, 0))
+
+    while stack:
+        cur = stack.pop()
+
+        if cur.x == target or cur.y == target or cur.z == target:
+            return cur
+
+        for next_state in get_next_states(cur, a, b, c):
+            key = (next_state.x, next_state.y, next_state.z)
+            if key not in visited:
+                visited.add(key)
+                stack.append(next_state)
+
+    return None
+
+
+# Print solution path
+def print_path(goal):
+    path = []
+    while goal:
+        path.append(goal)
+        goal = goal.parent
+
+    for s in reversed(path):
+        print(f"({s.x}, {s.y}, {s.z})")
+
+if __name__ == "__main__":
+    a = 8   
+    b = 5   
+    c = 3   
+    target = 4
+
+    print("DFS Solution:")
+    result = dfs(a, b, c, target)
+    print_path(result)
+
+OUTPUT:
+
+DFS Solution:
+(0, 0, 0)
+(0, 0, 3)
+(0, 3, 0)
+(0, 3, 3)
+(0, 5, 1)
+(1, 5, 0)
+(1, 2, 3)
+(4, 2, 0)
+
