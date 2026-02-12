@@ -1,0 +1,49 @@
+
+rows, cols = 4, 4
+
+home = (2, 2)    # Home with item
+start = (0, 3)   # Picker starting position
+
+grid = [['.' for _ in range(cols)] for _ in range(rows)]
+
+grid[home[0]][home[1]] = 'H'   # H = Home with item
+
+
+def manhattan_path(start, goal):
+    path = []
+    r, c = start
+    gr, gc = goal
+    
+    while r != gr:
+        r += 1 if gr > r else -1
+        path.append((r, c))
+   
+    while c != gc:
+        c += 1 if gc > c else -1
+        path.append((r, c))
+    return path
+path = manhattan_path(start, home)
+
+
+for r, c in path:
+    if grid[r][c] != 'H':
+        grid[r][c] = 'P'  
+grid[start[0]][start[1]] = 'S'
+
+
+print("4x4 Grid showing path from Picker to Home (S=Start, H=Home, P=Path):")
+for row in grid:
+    print(' '.join(row))
+
+
+print("\nStep sequence:", [start] + path)
+
+output:
+
+4x4 Grid showing path from Picker to Home (S=Start, H=Home, P=Path):
+. . . S
+. . . P
+. . H P
+. . . .
+
+Step sequence: [(0, 3), (1, 3), (2, 3), (2, 2)]
