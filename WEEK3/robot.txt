@@ -1,0 +1,85 @@
+import heapq
+
+
+grid = [
+    [0, 0, 0, 0],
+    [0, 1, 0, 0],
+    [0, 1, 0, 0],
+    [0, 0, 0, 0]
+]
+
+start = (0, 0)
+goal = (3, 3)
+
+def heuristic(a, b):
+    return abs(a[0] - b[0]) + abs(a[1] - b[1])
+
+def get_neighbors(pos, grid):
+    neighbors = []
+    rows, cols = len(grid), len(grid[0])
+    directions = [(-1,0),(1,0),(0,-1),(0,1)]
+    for dr, dc in directions:
+        r, c = pos[0] + dr, pos[1] + dc
+        if 0 <= r < rows and 0 <= c < cols and grid[r][c] == 0:
+            neighbors.append((r, c))
+    return neighbors
+
+def a_star(start, goal, grid):
+    open_list = []
+    heapq.heappush(open_list, (heuristic(start, goal), 0, start))
+    came_from = {}
+    g_score = {start: 0}
+
+    while open_list:
+        f, g, current = heapq.heappop(open_list)
+        if current == goal:
+            # Reconstruct path
+            path = []
+            while current in came_from:
+                path.append(current)
+                current = came_from[current]
+            path.append(start)
+            path.reverse()
+            return path
+
+        for neighbor in get_neighbors(current, grid):
+            tentative_g = g_score[current] + 1
+            if neighbor not in g_score or tentative_g < g_score[neighbor]:
+                g_score[neighbor] = tentative_g
+                f_score = tentative_g + heuristic(neighbor, goal)
+                heapq.heappush(open_list, (f_score, tentative_g, neighbor))
+                came_from[neighbor] = current
+
+    return None
+path = a_star(start, goal, grid)
+
+
+display_grid = [['.' for _ in range(4)] for _ in range(4)]
+
+for r in range(4):
+    for c in range(4):
+        if grid[r][c] == 1:
+            display_grid[r][c] = 'X'  # obstacle
+
+if path:
+    for r, c in path:
+        display_grid[r][c] = 'P'  # path
+
+
+display_grid[start[0]][start[1]] = 'S'
+display_grid[goal[0]][goal[1]] = 'G'
+
+
+for row in display_grid:
+    print(' '.join(row))
+
+output:
+S P P P
+. X . P
+. X . P
+. . . G
+
+s=initial
+p=path
+g=goal
+x=obstacle
