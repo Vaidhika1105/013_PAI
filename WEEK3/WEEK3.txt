@@ -1,0 +1,175 @@
+AIM : 8 PUZZLER SOLVER USING HEURISTIC SEARCH TECHNIQUE
+
+CODE :
+
+import heapq
+
+GOAL_STATE = ((1, 2, 3),
+              (4, 5, 6),
+              (7, 8, 0))   
+
+
+def heuristic(state):
+    distance = 0
+    for i in range(3):
+        for j in range(3):
+            value = state[i][j]
+            if value != 0:
+                goal_x = (value - 1) // 3
+                goal_y = (value - 1) % 3
+                distance += abs(i - goal_x) + abs(j - goal_y)
+    return distance
+
+def find_blank(state):
+    for i in range(3):
+        for j in range(3):
+            if state[i][j] == 0:
+                return i, j
+
+def get_neighbors(state):
+    neighbors = []
+    x, y = find_blank(state)
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]  
+
+    for dx, dy in directions:
+        new_x, new_y = x + dx, y + dy
+        if 0 <= new_x < 3 and 0 <= new_y < 3:
+            new_state = [list(row) for row in state]
+            new_state[x][y], new_state[new_x][new_y] = new_state[new_x][new_y], new_state[x][y]
+            neighbors.append(tuple(tuple(row) for row in new_state))
+
+    return neighbors
+
+def a_star(start):
+    pq = []
+    heapq.heappush(pq, (heuristic(start), 0, start, []))
+    visited = set()
+
+    while pq:
+        f, g, current, path = heapq.heappop(pq)
+
+        if current in visited:
+            continue
+
+        visited.add(current)
+        path = path + [current]
+
+        if current == GOAL_STATE:
+            return path
+
+        for neighbor in get_neighbors(current):
+            if neighbor not in visited:
+                heapq.heappush(pq, (g + 1 + heuristic(neighbor), g + 1, neighbor, path))
+
+    return None
+
+def print_puzzle(state):
+    for row in state:
+        print(row)
+    print()
+
+start_state = ((1, 2, 4),
+               (6, 5, 0),
+               (7, 8, 3))
+
+solution = a_star(start_state)
+
+if solution:
+    print("Solution Found!\n")
+    for step, state in enumerate(solution):
+        print(f"Step {step}:")
+        print_puzzle(state)
+
+    print("Total Moves:", len(solution) - 1)
+else:
+    print("No Solution Found.")
+
+
+
+OUTPUT:
+
+Solution Found!
+
+Step 0:
+(1, 2, 4)
+(6, 5, 0)
+(7, 8, 3)
+
+Step 1:
+(1, 2, 4)
+(6, 5, 3)
+(7, 8, 0)
+
+Step 2:
+(1, 2, 4)
+(6, 5, 3)
+(7, 0, 8)
+
+Step 3:
+(1, 2, 4)
+(6, 0, 3)
+(7, 5, 8)
+
+Step 4:
+(1, 2, 4)
+(0, 6, 3)
+(7, 5, 8)
+
+Step 5:
+(0, 2, 4)
+(1, 6, 3)
+(7, 5, 8)
+
+Step 6:
+(2, 0, 4)
+(1, 6, 3)
+(7, 5, 8)
+
+Step 7:
+(2, 4, 0)
+(1, 6, 3)
+(7, 5, 8)
+
+Step 8:
+(2, 4, 3)
+(1, 6, 0)
+(7, 5, 8)
+
+Step 9:
+(2, 4, 3)
+(1, 0, 6)
+(7, 5, 8)
+
+Step 10:
+(2, 0, 3)
+(1, 4, 6)
+(7, 5, 8)
+
+Step 11:
+(0, 2, 3)
+(1, 4, 6)
+(7, 5, 8)
+
+Step 12:
+(1, 2, 3)
+(0, 4, 6)
+(7, 5, 8)
+
+Step 13:
+(1, 2, 3)
+(4, 0, 6)
+(7, 5, 8)
+
+Step 14:
+(1, 2, 3)
+(4, 5, 6)
+(7, 0, 8)
+
+Step 15:
+(1, 2, 3)
+(4, 5, 6)
+(7, 8, 0)
+
+Total Moves: 15
+
+
