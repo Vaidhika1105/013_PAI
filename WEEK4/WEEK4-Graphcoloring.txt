@@ -1,0 +1,81 @@
+EXPERIMENT-4:
+
+AIM : Implement the constraint satisfactory problem using backtracking
+
+Problem 1 : Graph Coloring 
+
+CODE :
+
+# Graph Coloring using Backtracking
+
+V = 5
+
+# Check if assigning color c to vertex v is safe
+def is_safe(v, graph, colors, c):
+    for i in range(V):
+        if graph[v][i] == 1 and colors[i] == c:
+            return False
+    return True
+
+
+def graph_coloring_util(graph, m, colors, v):
+    if v == V:
+        return True
+
+    for c in range(1, m + 1):
+        if is_safe(v, graph, colors, c):
+            colors[v] = c
+
+            if graph_coloring_util(graph, m, colors, v + 1):
+                return True
+
+            colors[v] = 0
+
+    return False
+
+
+def graph_coloring(graph, m):
+
+    colors = [0] * V
+
+    if not graph_coloring_util(graph, m, colors, 0):
+        print("Solution does not exist")
+        return
+
+    color_names = {
+        1: "Red",
+        2: "Green",
+        3: "Blue",
+        4: "Yellow",
+        5: "Orange"
+    }
+
+    print("Node Coloring Result:\n")
+
+    for i in range(V):
+        print("Node", i, "->", color_names[colors[i]])
+
+
+# Graph represented as adjacency matrix
+graph = [
+    [0,1,1,0,0],
+    [1,0,1,1,0],
+    [1,1,0,0,1],
+    [0,1,0,0,1],
+    [0,0,1,1,0]
+]
+
+m = 3  # number of colors
+
+graph_coloring(graph, m)
+
+
+OUTPUT :
+
+Node Coloring Result:
+
+Node 0 -> Red
+Node 1 -> Green
+Node 2 -> Blue
+Node 3 -> Red
+Node 4 -> Green
