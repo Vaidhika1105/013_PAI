@@ -1,0 +1,84 @@
+CASE STUDY GAME SEARCH : Cybersecurity Attack–Defense Simulator using Minimax 
+
+CODE: 
+
+# Step 1: Evaluation Function
+def evaluate(state):
+    if state == "secure":
+        return 10      # Defender wins
+    elif state == "breached":
+        return -10     # Attacker wins
+    else:
+        return 0       # Neutral
+
+
+# Step 2: State Transitions
+def get_next_states(state, is_defender):
+    if is_defender:
+        # Defender actions (patch, monitor)
+        if state == "neutral":
+            return ["secure", "neutral"]
+        elif state == "breached":
+            return ["neutral", "breached"]
+        else:
+            return ["secure"]
+    else:
+        # Attacker actions (exploit, phishing)
+        if state == "neutral":
+            return ["breached", "neutral"]
+        elif state == "secure":
+            return ["neutral", "secure"]
+        else:
+            return ["breached"]
+
+
+# Step 3: Minimax Algorithm
+def minimax(state, depth, is_defender):
+
+    # Base Case
+    if depth == 0 or state in ["secure", "breached"]:
+        return evaluate(state)
+
+    if is_defender:  # Maximizing player
+        max_eval = float('-inf')
+        for next_state in get_next_states(state, True):
+            eval = minimax(next_state, depth - 1, False)
+            max_eval = max(max_eval, eval)
+        return max_eval
+
+    else:  # Minimizing player (Attacker)
+        min_eval = float('inf')
+        for next_state in get_next_states(state, False):
+            eval = minimax(next_state, depth - 1, True)
+            min_eval = min(min_eval, eval)
+        return min_eval
+
+
+# Step 4: Best Move Selection (Defender)
+def get_best_move(state, depth):
+    best_move = None
+    best_value = float('-inf')
+
+    for next_state in get_next_states(state, True):
+        move_value = minimax(next_state, depth - 1, False)
+
+        if move_value > best_value:
+            best_value = move_value
+            best_move = next_state
+
+    return best_move, best_value
+
+
+# ========================
+# Step 5: Run Simulation
+# ========================
+
+initial_state = "neutral"
+depth = 3
+
+print("Initial System State:", initial_state)
+
+best_move, score = get_best_move(initial_state, depth)
+
+print("Best Action leads to state:", best_move)
+print("Optimal Security Outcome Score:", score)
